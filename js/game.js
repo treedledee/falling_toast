@@ -57,13 +57,6 @@ var reset = function () {
 	monster.y = 32 + (Math.random() * (canvas.height - 64));
 };
 
-//TODO prevent toaster from leaving canvas
-//TODO make the toast fall from the top of the screen
-//TODO heart life tracking
-//TODO increase difficulty of game as time goes on
-//TODO store sprites in array and "randomly" pick sprite to drop + speed
-
-
 // Update game objects
 var update = function (modifier) {
 	if (38 in keysDown) { // Player holding up
@@ -74,9 +67,15 @@ var update = function (modifier) {
 	}
 	if (37 in keysDown) { // Player holding left
 		hero.x -= hero.speed * modifier;
+		if (hero.x <= 0) {
+		    hero.x = 0;
+		}
 	}
 	if (39 in keysDown) { // Player holding right
 		hero.x += hero.speed * modifier;
+		if (hero.x >= 455) { // not sure why canvas width does not match
+		    hero.x = 455;
+		}
 	}
 
 	// Are they touching?
@@ -91,6 +90,13 @@ var update = function (modifier) {
 	}
 };
 
+var noOfMonsters = 5;
+
+//TODO make the toast fall from the top of the screen
+//TODO heart life tracking
+//TODO increase difficulty of game as time goes on
+//TODO store sprites in array and "randomly" pick sprite to drop + speed
+
 // Draw everything
 var render = function () {
 	if (bgReady) {
@@ -101,8 +107,16 @@ var render = function () {
 		ctx.drawImage(heroImage, hero.x, hero.y);
 	}
 
-	if (monsterReady) {
+	/*if (monsterReady) {
 		ctx.drawImage(monsterImage, monster.x, monster.y);
+	}*/
+	for (var i = 0; i < noOfMonsters; i++) {
+	    ctx.drawImage(monsterImage, monster.x, monster.y) //the toast
+	    monster.y += monster.speed; //Set the falling speed
+        if (monster.y > 450) {  //Repeat the raindrop when it falls out of view
+            monster.y = -25 //Account for the image size
+            monster.x = Math.random() * 480;    //Make it appear randomly along the width 
+	    }
 	}
 
 	// Score

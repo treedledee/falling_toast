@@ -1,8 +1,8 @@
 // Create the canvas
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
-canvas.width = 492;
-canvas.height = 492;
+canvas.width = 520;
+canvas.height = 480;
 document.body.appendChild(canvas);
 
 // Background image
@@ -13,24 +13,24 @@ bgImage.onload = function () {
 };
 bgImage.src = "images/background.png";
 
-// hero image
-var heroReady = false;
-var heroImage = new Image();
-heroImage.onload = function () {
-	heroReady = true;
+// Toaster image
+var toasterReady = false;
+var toasterImage = new Image();
+toasterImage.onload = function () {
+	toasterReady = true;
 };
-heroImage.src = "images/toaster.png";
+toasterImage.src = "images/toaster.png";
 
-// Monster image
-var monsterReady = false;
-var monsterImage = new Image();
-monsterImage.onload = function () {
-	monsterReady = true;
+// Toast image
+var toastReady = false;
+var toastImage = new Image();
+toastImage.onload = function () {
+	toastReady = true;
 };
-monsterImage.src = "images/toast.png";
+toastImage.src = "images/toast.png";
 
 // Game objects
-var hero = {
+var toaster = {
 	speed: 256 // movement in pixels per second
 };
 var monster = {};
@@ -47,14 +47,14 @@ addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
-// Reset the game when the player catches a monster
+// Reset the game when the player catches a toast
 var reset = function () {
 	hero.x = canvas.width / 2;
-	hero.y = 7*(canvas.height / 8);
+	hero.y = canvas.height / 5;
 
 	// Throw the monster somewhere on the screen randomly
-	monster.x = 32 + (Math.random() * (canvas.width - 64));
-	monster.y = 32 + (Math.random() * (canvas.height - 64));
+	toast.x = 32 + (Math.random() * (canvas.width - 64));
+	toast.y = 32 + (Math.random() * (canvas.height - 64));
 };
 
 // Update game objects
@@ -67,36 +67,22 @@ var update = function (modifier) {
 	}
 	if (37 in keysDown) { // Player holding left
 		hero.x -= hero.speed * modifier;
-		if (hero.x <= 0) {
-		    hero.x = 0;
-		}
 	}
 	if (39 in keysDown) { // Player holding right
 		hero.x += hero.speed * modifier;
-		if (hero.x >= 455) {
-		    hero.x = 455;
-		}
 	}
 
 	// Are they touching?
 	if (
-		hero.x <= (monster.x + 32)
-		&& monster.x <= (hero.x + 32)
-		&& hero.y <= (monster.y + 32)
-		&& monster.y <= (hero.y + 32)
+		toaster.x <= (toast.x + 32)
+		&& toast.x <= (toaster.x + 32)
+		&& toaster.y <= (toast.y + 32)
+		&& toast.y <= (toaster.y + 32)
 	) {
-		++monstersCaught;
+		++toastsCaught;
 		reset();
 	}
 };
-
-var noOfMonsters = 5;
-
-//TODO prevent toaster from leaving canvas
-//TODO make the toast fall from the top of the screen
-//TODO heart life tracking
-//TODO increase difficulty of game as time goes on
-//TODO store sprites in array and "randomly" pick sprite to drop + speed
 
 // Draw everything
 var render = function () {
@@ -104,28 +90,20 @@ var render = function () {
 		ctx.drawImage(bgImage, 0, 0);
 	}
 
-	if (heroReady) {
-		ctx.drawImage(heroImage, hero.x, hero.y);
+	if (toasterReady) {
+		ctx.drawImage(toasterImage, toaster.x, toaster.y);
 	}
 
-	/*if (monsterReady) {
-		ctx.drawImage(monsterImage, monster.x, monster.y);
-	}*/
-	for (var i = 0; i < noOfMonsters; i++) {
-	    ctx.drawImage(monsterImage, monster.x, monster.y) //the toast
-	    monster.y += monster.speed; //Set the falling speed
-        if (monster.y > 450) {  //Repeat the raindrop when it falls out of view
-            monster.y = -25 //Account for the image size
-            monster.x = Math.random() * 480;    //Make it appear randomly along the width 
-	    }
+	if (toastReady) {
+		ctx.drawImage(toastImage, toast.x, toast.y);
 	}
 
 	// Score
-	ctx.fillStyle = "rgb(0, 100, 200)";
+	ctx.fillStyle = "rgb(250, 250, 250)";
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Foods caught: " + monstersCaught, 32, 32);
+	ctx.fillText("Toast caught: " + monstersCaught, 32, 32);
 };
 
 // The main game loop
